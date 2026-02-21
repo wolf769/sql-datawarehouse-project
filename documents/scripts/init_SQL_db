@@ -1,0 +1,72 @@
+/*
+============================================================
+ Script:        create_schemas.sql
+ Description:   Creates Bronze, Silver, and Gold schemas
+ Author:        WOLFGANG
+ Date:          2026-02-21
+============================================================
+Script Purpose:
+This script initializes the DataWarehouse database and 
+creates a structured multi-layer schema architecture 
+following the Medallion (Bronze, Silver, Gold) design pattern.
+
+The purpose of each schema is:
+
+- bronze  : Stores raw, untransformed source data.
+- silver  : Stores cleaned and transformed data ready for modeling.
+- gold    : Stores curated, business-ready data optimized 
+            for reporting and analytics.
+
+This layered approach improves data quality, maintainability,
+and separation of concerns within the data pipeline.
+
+------------------------------------------------------------
+-- 1️⃣ Create Database (from master)
+------------------------------------------------------------
+USE master;
+GO
+
+IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = 'DataWarehouse')
+BEGIN
+    CREATE DATABASE DataWarehouse;
+END
+GO
+
+------------------------------------------------------------
+-- 2️⃣ Switch to DataWarehouse database
+------------------------------------------------------------
+USE DataWarehouse;
+GO
+
+------------------------------------------------------------
+-- 3️⃣ Create Schemas
+------------------------------------------------------------
+
+-- Bronze Schema (Raw Layer)
+IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = 'bronze')
+BEGIN
+    EXEC('CREATE SCHEMA bronze');
+END
+GO
+
+-- Silver Schema (Cleaned Layer)
+IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = 'silver')
+BEGIN
+    EXEC('CREATE SCHEMA silver');
+END
+GO
+
+-- Gold Schema (Business Layer)
+IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = 'gold')
+BEGIN
+    EXEC('CREATE SCHEMA gold');
+END
+GO
+
+------------------------------------------------------------
+-- 4️⃣ Verify Schemas
+------------------------------------------------------------
+SELECT name AS SchemaName
+FROM sys.schemas
+WHERE name IN ('bronze', 'silver', 'gold');
+GO
